@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PlacementPro</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial;
+      background: #ffffff;
+      color: #111;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 50px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .nav-right button {
+      margin-left: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .login-btn {
+      background: #2563eb;
+      color: white;
+    }
+
+    .dash-btn {
+      background: #e5e7eb;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+
+    .hero h1 {
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      color: #666;
+    }
+
+    /* MAIN CARD */
+    .main {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    button.action {
+      width: 100%;
+      padding: 10px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    button.action:hover {
+      background: #1d4ed8;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .box {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      width: 100px;
+      text-align: center;
+    }
+
+    .box p {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* RESULTS */
+    #results {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+
+    .student {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* CHATBOT */
+    .chatbox {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 260px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .chatbox input {
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .chatbox button {
+      width: 100%;
+      margin-top: 5px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    /* LOGIN MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="logo">PlacementPro</div>
+
+  <div class="nav-right">
+    <button class="dash-btn" onclick="loadDashboard()">Dashboard</button>
+    <button class="login-btn" onclick="openLogin()">Login</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Student Eligibility System</h1>
+  <p>Filter and analyze students for placements</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- FILTER -->
+  <div class="card">
+    <h3>Check Eligibility</h3>
+
+    <input id="cgpa" placeholder="CGPA">
+    <input id="branch" placeholder="Branch">
+    <input id="backlogs" placeholder="Backlogs">
+
+    <button class="action" onclick="runSystem()">Run Analysis</button>
+  </div>
+
+  <!-- RESUME AI -->
+  <div class="card">
+    <h3>Resume Score</h3>
+
+    <textarea id="resume" rows="6" style="width:100%"></textarea>
+
+    <button class="action" onclick="scoreResume()">Analyze Resume</button>
+
+    <p id="score"></p>
+  </div>
+
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="box">
+    <h4>Total</h4>
+    <p id="total">0</p>
+  </div>
+
+  <div class="box">
+    <h4>Eligible</h4>
+    <p id="eligible">0</p>
+  </div>
+
+  <div class="box">
+    <h4>Not Eligible</h4>
+    <p id="notEligible">0</p>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results"></div>
+
+<!-- CHATBOT -->
+<div class="chatbox">
+  <b>Assistant</b>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Ask something...">
+  <button onclick="sendMsg()">Send</button>
+</div>
+
+<!-- LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <h3>Login</h3>
+    <input id="email" placeholder="Email">
+    <input id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<script>
+
+async function runSystem() {
+  const cgpa = document.getElementById("cgpa").value;
+  const branch = document.getElementById("branch").value;
+  const backlogs = document.getElementById("backlogs").value;
+
+  const res = await fetch(`http://localhost:5000/eligible?cgpa=${cgpa}&branch=${branch}&backlogs=${backlogs}`);
+  const data = await res.json();
+
+  let results = document.getElementById("results");
+  results.innerHTML = "";
+
+  data.forEach(s => {
+    results.innerHTML += `
+      <div class="student">
+        <b>${s.name}</b><br>
+        CGPA: ${s.cgpa} | ${s.branch}
+      </div>
+    `;
+  });
+
+  let total = data.length + 3;
+  document.getElementById("total").innerText = total;
+  document.getElementById("eligible").innerText = data.length;
+  document.getElementById("notEligible").innerText = total - data.length;
+}
+
+async function scoreResume() {
+  const text = document.getElementById("resume").value;
+
+  const res = await fetch("http://localhost:5000/ai-score", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({resumeText: text})
+  });
+
+  const data = await res.json();
+
+  document.getElementById("score").innerText =
+    "Score: " + data.score + "/100";
+}
+
+async function sendMsg() {
+  const msg = document.getElementById("msg").value;
+
+  const res = await fetch("http://localhost:5000/chat", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({message: msg})
+  });
+
+  const data = await res.json();
+
+  document.getElementById("chat").innerHTML += "<div>"+msg+"</div>";
+  document.getElementById("chat").innerHTML += "<div>"+data.reply+"</div>";
+}
+
+function openLogin() {
+  document.getElementById("loginModal").style.display = "flex";
+}
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://localhost:5000/login", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({email, password})
+  });
+
+  const data = await res.json();
+
+  alert(data.message);
+}
+
+async function loadDashboard() {
+  const res = await fetch("http://localhost:5000/students");
+  const data = await res.json();
+
+  let results = document.getElementById("results");
+  results.innerHTML = "<h3>All Students</h3>";
+
+  data.forEach(s => {
+    results.innerHTML += `
+      <div class="student">
+        ${s.name} - ${s.cgpa}
+      </div>
+    `;
+  });
+}
+
+</script>
+
+</body>
+</html>
