@@ -13,7 +13,7 @@ app.use(express.json());
 // ================== BASIC ROUTE ==================
 
 app.get("/", (req, res) => {
-  res.send("PlacementPro API Running 🚀");
+  res.send("PlacementPro API Running ");
 });
 
 // ================== ADD STUDENT ==================
@@ -42,8 +42,8 @@ app.get("/eligible", async (req, res) => {
     };
 
     if (branch !== "") {
-      query.branch = branch;
-    }
+    query.branch = { $regex: branch, $options: "i" };
+}
 
     const students = await Student.find(query);
     res.json(students);
@@ -168,6 +168,24 @@ async function startServer() {
     process.exit(1);
   }
 }
+
+// ================== SEED STUDENT (TEMPORARY) ==================
+
+app.get("/seed", async (req, res) => {
+  try {
+    await Student.create({
+      name: "John Doe",
+      cgpa: 8.2,
+      branch: "CSE",
+      backlogs: 0
+    });
+
+    res.send("Student added successfully ✅");
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 startServer();
 // ================== AI CHATBOT ==================
