@@ -104,23 +104,57 @@ async function startServer() {
     const uri = process.env.MONGO_URI;
 
     if (!uri) {
-      console.log("❌ MONGO_URI missing");
+      console.log(" MONGO_URI NOT FOUND");
       process.exit(1);
     }
 
     await mongoose.connect(uri);
-    console.log("MongoDB Connected ✅");
+    console.log(" MongoDB Connected");
 
     const PORT = process.env.PORT || 5000;
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(" Server running on port " + PORT);
     });
 
   } catch (err) {
-    console.log("❌ Server Error:", err.message);
+    console.log(" ERROR:", err);
     process.exit(1);
   }
 }
 
 startServer();
+
+startServer();
+// ================== AI CHATBOT ==================
+
+/*
+app.post("/chat", async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    const API_KEY = process.env.OPENAI_API_KEY;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: message }],
+      }),
+    });
+
+    const data = await response.json();
+
+    res.json({
+      reply: data.choices?.[0]?.message?.content || "No response",
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+*/
