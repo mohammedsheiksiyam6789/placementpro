@@ -103,11 +103,12 @@ async function startServer() {
   try {
     const uri = process.env.MONGO_URI;
 
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    if (!uri) {
+      console.log("❌ MONGO_URI missing");
+      process.exit(1);
+    }
 
+    await mongoose.connect(uri);
     console.log("MongoDB Connected ✅");
 
     const PORT = process.env.PORT || 5000;
@@ -117,7 +118,8 @@ async function startServer() {
     });
 
   } catch (err) {
-    console.log("Server Error:", err);
+    console.log("❌ Server Error:", err.message);
+    process.exit(1);
   }
 }
 
