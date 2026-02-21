@@ -6,10 +6,11 @@ const cors = require("cors");
 const Student = require("./models/Student");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// ================== BASIC ROUTES ==================
+// ================== BASIC ROUTE ==================
 
 app.get("/", (req, res) => {
   res.send("PlacementPro API Running 🚀");
@@ -21,7 +22,7 @@ app.post("/add-student", async (req, res) => {
   try {
     const student = new Student(req.body);
     await student.save();
-    res.json({ message: "Student added", student });
+    res.json({ message: "Student added successfully", student });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -31,15 +32,22 @@ app.post("/add-student", async (req, res) => {
 
 app.get("/eligible", async (req, res) => {
   try {
-    const { cgpa, branch, backlogs } = req.query;
+    const cgpa = Number(req.query.cgpa) || 0;
+    const branch = req.query.branch || "";
+    const backlogs = Number(req.query.backlogs) || 10;
 
-    const students = await Student.find({
-      cgpa: { $gte: Number(cgpa) },
-      branch: branch,
-      backlogs: { $lte: Number(backlogs) },
-    });
+    const query = {
+      cgpa: { $gte: cgpa },
+      backlogs: { $lte: backlogs }
+    };
 
+    if (branch !== "") {
+      query.branch = branch;
+    }
+
+    const students = await Student.find(query);
     res.json(students);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -58,23 +66,61 @@ app.get("/students", async (req, res) => {
 
 // ================== AI RESUME SCORING ==================
 
-app.post("/ai-score", async (req, res) => {
+app.post("/ai-score", (req, res) => {
   try {
     const { resumeText } = req.body;
 
+    if (!resumeText) {
+      return res.json({ score: 0, feedback: "Resume text required." });
+    }
+
+    const text = resumeText.toLowerCase();
     let score = 50;
 
-    if (resumeText.includes("project")) score += 10;
-    if (resumeText.includes("internship")) score += 15;
-    if (resumeText.includes("skills")) score += 10;
+    if (text.includes("project")) score += 10;
+    if (text.includes("internship")) score += 15;
+    if (text.includes("skills")) score += 10;
     if (resumeText.length > 300) score += 15;
 
     if (score > 100) score = 100;
 
     res.json({
       score,
-      feedback: "Add more projects and internships to improve your profile.",
+      feedback: "Add more measurable achievements and internships."
     });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ================== CHATBOT ==================
+
+app.post("/chat", (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.json({ reply: "Please enter a valid message." });
+    }
+
+    const msg = message.toLowerCase();
+    let reply = "Please contact placement office for detailed information.";
+
+    if (msg.includes("cutoff"))
+      reply = "Typical cutoff CGPA is 7.0+ depending on company.";
+
+    else if (msg.includes("interview"))
+      reply = "Interview schedules are shared via email to eligible students.";
+
+    else if (msg.includes("company"))
+      reply = "Multiple companies are visiting this month for placements.";
+
+    else if (msg.includes("eligible"))
+      reply = "Eligibility depends on CGPA, branch, and backlogs criteria.";
+
+    res.json({ reply });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -84,7 +130,7 @@ app.post("/ai-score", async (req, res) => {
 
 const recruiter = {
   email: "admin@placementpro.com",
-  password: "123456",
+  password: "123456"
 };
 
 app.post("/login", (req, res) => {
@@ -104,26 +150,24 @@ async function startServer() {
     const uri = process.env.MONGO_URI;
 
     if (!uri) {
-      console.log(" MONGO_URI NOT FOUND");
+      console.log("MONGO_URI not found");
       process.exit(1);
     }
 
     await mongoose.connect(uri);
-    console.log(" MongoDB Connected");
+    console.log("MongoDB Connected");
 
     const PORT = process.env.PORT || 5000;
 
     app.listen(PORT, () => {
-      console.log(" Server running on port " + PORT);
+      console.log("Server running on port " + PORT);
     });
 
   } catch (err) {
-    console.log(" ERROR:", err);
+    console.log("ERROR:", err);
     process.exit(1);
   }
 }
-
-startServer();
 
 startServer();
 // ================== AI CHATBOT ==================
